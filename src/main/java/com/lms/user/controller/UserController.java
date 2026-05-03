@@ -46,4 +46,9 @@ public class UserController {
     public void approveInstructor(@PathVariable Long id) {
         service.approveInstructor(id);
     }
+
+    @GetMapping("/stats")
+    public UserStatsResponse getStats() {
+        return service.getStats();
+    }
 }

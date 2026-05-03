@@ -1,5 +1,6 @@
 package com.lms.user.service.Impl;
 
+import com.lms.user.dto.UserStatsResponse;
 import com.lms.user.exceptions.UserNotFoundException;
 import com.lms.user.model.User;
 import com.lms.user.repo.UserRepository;
@@ -7,7 +8,10 @@ import com.lms.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -49,5 +53,27 @@ public class UserServiceImp implements UserService {
 
         user.setIsApproved(true);
         repository.save(user);
+    }
+
+    @Override
+    public UserStatsResponse getStats() {
+        List<Object[]> roleCounts = repository.countUsersByRole();
+        Map<String, Long> usersByRole = new HashMap<>();
+        for (Object[] row : roleCounts) {
+            usersByRole.put((String) row[0], (Long) row[1]);
+        }
+
+        long totalUsers = usersByRole.values().stream().mapToLong(Long::longValue).sum();
+        long approvedInstructors = repository.countApprovedInstructors();
+        long pendingInstructors = repository.countPendingInstructors();
+        long recentRegistrations = repository.countRecentRegistrations(LocalDateTime.now().minusDays(30));
+
+        return UserStatsResponse.builder()
+                .totalUsers(totalUsers)
+                .usersByRole(usersByRole)
+                .approvedInstructors(approvedInstructors)
+                .pendingInstructors(pendingInstructors)
+                .recentRegistrations(recentRegistrations)
+                .build();
     }
 }
