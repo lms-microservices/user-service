@@ -5,6 +5,6 @@ import lombok.Data;
 
 @Data
 public class UpdateUserRequest {
-    @NotBlank
+    @NotBlank(message = "Full name is required")
     private String fullName;
 }

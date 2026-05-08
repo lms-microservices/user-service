@@ -1,5 +1,6 @@
 package com.lms.user.repo;
 
+import com.lms.user.model.Role;
 import com.lms.user.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,9 +12,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepo extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
-    List<User> findByRole(com.lms.user.model.Role role);
+    List<User> findByRole(Role role);
 
     @Query("SELECT r.name, COUNT(u) FROM User u JOIN u.role r GROUP BY r.name")
     List<Object[]> countUsersByRole();

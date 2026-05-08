@@ -1,9 +1,10 @@
-package com.lms.user.service.Impl;
+package com.lms.user.service.impl;
 
 import com.lms.user.dto.UserStatsResponse;
+import com.lms.user.exceptions.NotInstructorException;
 import com.lms.user.exceptions.UserNotFoundException;
 import com.lms.user.model.User;
-import com.lms.user.repo.UserRepository;
+import com.lms.user.repo.UserRepo;
 import com.lms.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,20 +16,20 @@ import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImp implements UserService {
+public class UserServiceImpl implements UserService {
 
-    private final UserRepository repository;
+    private final UserRepo repository;
 
     @Override
     public User getById(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with id: " + id));
     }
 
     @Override
     public User getByEmail(String email) {
         return repository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found with email: " + email));
     }
 
     @Override
@@ -48,7 +49,7 @@ public class UserServiceImp implements UserService {
         User user = getById(id);
 
         if (!"INSTRUCTOR".equals(user.getRole().getName())) {
-            throw new RuntimeException("User is not an instructor");
+            throw new NotInstructorException(id);
         }
 
         user.setIsApproved(true);

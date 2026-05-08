@@ -1,9 +1,13 @@
 package com.lms.user.controller;
 
-import com.lms.user.dto.*;
+import com.lms.user.dto.UpdateUserRequest;
+import com.lms.user.dto.UserResponse;
+import com.lms.user.dto.UserStatsResponse;
 import com.lms.user.mapper.UserMapper;
 import com.lms.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,39 +20,39 @@ public class UserController {
     private final UserService service;
 
     @GetMapping("/{id}")
-    public UserResponse getById(@PathVariable Long id) {
-        return UserMapper.toResponse(service.getById(id));
+    public ResponseEntity<UserResponse> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(UserMapper.toResponse(service.getById(id)));
     }
 
     @GetMapping("/email/{email}")
-    public UserResponse getByEmail(@PathVariable String email) {
-        return UserMapper.toResponse(service.getByEmail(email));
+    public ResponseEntity<UserResponse> getByEmail(@PathVariable String email) {
+        return ResponseEntity.ok(UserMapper.toResponse(service.getByEmail(email)));
     }
 
     @GetMapping
-    public List<UserResponse> getAll() {
-        return service.getAll().stream()
+    public ResponseEntity<List<UserResponse>> getAll() {
+        return ResponseEntity.ok(service.getAll().stream()
                 .map(UserMapper::toResponse)
-                .toList();
+                .toList());
     }
 
     @PutMapping("/{id}")
-    public UserResponse updateUser(
+    public ResponseEntity<UserResponse> updateUser(
             @PathVariable Long id,
-            @RequestBody UpdateUserRequest request
-    ) {
-        return UserMapper.toResponse(
+            @Valid @RequestBody UpdateUserRequest request) {
+        return ResponseEntity.ok(UserMapper.toResponse(
                 service.updateUser(id, request.getFullName())
-        );
+        ));
     }
 
     @PutMapping("/{id}/approve-instructor")
-    public void approveInstructor(@PathVariable Long id) {
+    public ResponseEntity<Void> approveInstructor(@PathVariable Long id) {
         service.approveInstructor(id);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/stats")
-    public UserStatsResponse getStats() {
-        return service.getStats();
+    public ResponseEntity<UserStatsResponse> getStats() {
+        return ResponseEntity.ok(service.getStats());
     }
 }
